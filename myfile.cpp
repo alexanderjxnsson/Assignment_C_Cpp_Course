@@ -5,6 +5,7 @@
 #include <vector>
 #include <time.h>
 #include <string>
+#include <cstdio>
 std::string fileName = "players.csv", adminPasswordInpuit, adminPassword = "666", value, seperator = "-----------------------------";
 int menuChoice, adminMenuChoice, idTracker = 0;
 bool bMenuRunning = true, bAdminMenu = true, bAdminModeLogin = true;
@@ -27,40 +28,28 @@ struct Players
     int Playerscore;
 }tPlayer;
 std::vector<std::string> vPlayers;
-/* bool writeRecordToFile (std::string file_name, std::string field_one, std::string field_two, std::string field_three, std::string field_four)
-{
-	std::ofstream file;
-	file.open(fileName, std::ios_base::app);	//
-	//file.open(file_name, ios::trunc); 		// over-write file
-	file << field_one << ";" << field_two << ";" << field_three << field_four << std::endl;
-	file.close();
 
-	return 0;	
-} */
-
-void adminDeletePlayer(std::string token)
+void adminDeletePlayer(std::string playerName)
 {
     std::string line;
     std::fstream fin;
     std::fstream fout;
     fin.open("players.csv", std::ios::in);
     fout.open("new.csv", std::ios::out | std::ios::app);
-    //std::cin>>token;
     std::vector<std::string> lines;
-    while (getline(fin, line))
+    while (std::getline(fin, line))
     {
-        if (line.find(token) == std::string::npos)
+        if (line.find(playerName) == std::string::npos)
         {
             fout << line << std::endl;
         }
     }
-    fout.close();
     fin.close();
-    remove("players.csv");
-    rename("new.csv", "players.csv");
+    fout.close();
+    std::remove("players.csv");
+    std::rename("new.csv", "players.csv");
     std::cout<<"\nPlayer and player data has been removed!\n";
 }
-
 
 
 std::vector<std::string> deleteSearchResult (std::string file_name, std::string search_term)
