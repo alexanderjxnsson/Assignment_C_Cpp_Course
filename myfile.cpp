@@ -1,4 +1,6 @@
 /* declarations start */
+//#include "declarations.h"
+/* declarations start */
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -6,21 +8,25 @@
 #include <time.h>
 #include <string>
 #include <cstdio>
-std::string fileName = "players.csv", adminPasswordInpuit, adminPassword = "666", value, seperator = "-----------------------------";
+#include <stdio.h>
+std::string fileName = "players.csv", adminPasswordInpuit, adminPassword = "666", value, seperator = "-----------------------------", playerToBeRemoved, deletePlayerChoice;
 int menuChoice, adminMenuChoice, idTracker = 0;
-bool bMenuRunning = true, bAdminMenu = true, bAdminModeLogin = true;
+bool bMenuRunning = true, bAdminMenu = true, bAdminModeLogin = true, bFileChecking = true, bDeletePlayerMenu = false;
 enum choicesForMenu {PLAY = 1, HIGHSCORE, ADMIN, EXITGAME};
-enum choicesForAdminMenu {DELETEPLAYER = 1, EXITADMINMENU};
+enum choicesForAdminMenu {DELETEPLAYER = 1, EMPTYHSLIST, EXITADMINMENU};
 std::fstream fout;
 std::fstream fin;
 std::fstream myFile;
+void fileChecking();
 void menu();
 void addPlayer();
 void theGame();
 void adminMode();
 void randomizer();
-void deletePlayerHsList();
 void showHighscoreList();
+void adminDeletePlayer(std::string playerName);
+void emptyHighscoreList();
+std::vector<std::string> readRecordFromFile (std::string file_name);
 struct Players
 {
     std::string playerName;
@@ -28,31 +34,10 @@ struct Players
     int Playerscore;
 }tPlayer;
 std::vector<std::string> vPlayers;
-
-void adminDeletePlayer(std::string playerName)
-{
-    std::string line;
-    std::fstream fin;
-    std::fstream fout;
-    fin.open("players.csv", std::ios::in);
-    fout.open("new.csv", std::ios::out | std::ios::app);
-    std::vector<std::string> lines;
-    while (std::getline(fin, line))
-    {
-        if (line.find(playerName) == std::string::npos)
-        {
-            fout << line << std::endl;
-        }
-    }
-    fin.close();
-    fout.close();
-    std::remove("players.csv");
-    std::rename("new.csv", "players.csv");
-    std::cout<<"\nPlayer and player data has been removed!\n";
-}
+/* declarations end */
 
 
-std::vector<std::string> deleteSearchResult (std::string file_name, std::string search_term)
+/* std::vector<std::string> deleteSearchResult (std::string file_name, std::string search_term)
 {
 	std::vector<std::string> record;
 	std::ifstream file;
@@ -80,48 +65,13 @@ std::vector<std::string> deleteSearchResult (std::string file_name, std::string 
 	}
 	file.close();
 	return record;
-}
+} */
 
-std::vector<std::string> readRecordFromFile (std::string file_name)
-{
-	std::vector<std::string> record;
-	std::ifstream file;
-	file.open(fileName);
-	std::string field_one, field_two, field_three;
-
-	while ( getline(file, field_one, ','))
-	{
-		getline(file, field_two, ',');
-        getline(file, field_three, '\n');
-
-		std::cout << field_one<< "\t"
-                  << field_two << "\t"
-                  << field_three << std::endl;
-	}
-
-	file.close();
-	return record;
-}
 /* declarations end */
 
 int main() {
     /* init start */
-    fin.open("players.csv", std::ios_base::app);
-    if (fin.is_open())
-    {
-        int sec = 3;
-        std::cout<<"File is good, proceed!\n";
-        system("pause");
-        system("cls");
-    }
-    else
-    {
-        std::cout<<"File is not OK, exiting the application!\n";
-        system("pause");
-        system("cls");
-        bMenuRunning = false;
-    }
-
+    fileChecking();
     /* init end */
     while (bMenuRunning == true)
     {
@@ -138,6 +88,9 @@ int main() {
             break;
         case HIGHSCORE:
             showHighscoreList();
+            std::cout<<"\nPress a button to exit the highscore list\n";
+            system("pause");
+            system("cls");
             break;
         case ADMIN:
             adminMode();
@@ -154,15 +107,33 @@ int main() {
             break;
         }
     }
-    
-
-
-    
-
-
 }
 
-/* functions start */
+/*functions start */
+void fileChecking()
+{
+        while (bFileChecking == true)
+    {
+        fin.open("players.csv", std::ios_base::app);
+        if (fin.is_open())
+        {
+            int sec = 3;
+            std::cout<<"File is good, proceed!\n";
+            fin.close();
+            bFileChecking = false;
+            system("pause");
+            system("cls");
+        }
+        else
+        {
+            std::cout<<"File is not OK, exiting the application!\n";
+            system("pause");
+            system("cls");
+            bFileChecking = false;
+            bMenuRunning = false;
+        }
+    }
+}
 void menu()
 {
     std::cout<<"Welcome to the end game!\n";
@@ -193,15 +164,10 @@ void theGame()
 {
 
 }
-
 void showHighscoreList()
 {
-    std::vector<std::string> Result = readRecordFromFile(fileName);
-    std::cout<<"\nPress a button to exit the highscore list\n";
-    system("pause");
-    system("cls");
+    std::vector<std::string> vDisplayHighscoreList = readRecordFromFile(fileName);
 }
-
 void adminMode()
 {
     //Logging in
@@ -217,7 +183,6 @@ void adminMode()
             bAdminModeLogin = false;
             system("pause");
             system("cls");
-            
         }
         else
         {
@@ -230,12 +195,18 @@ void adminMode()
     while (bAdminMenu == true)
     {
         std::cout<<"What do you want to do?\n";
-        std::cout<<"1. Delete person in highscore list\n2. Exit admin mode\n";
+        std::cout<<"1. Delete person in highscore list\n2. Empty the highscore list\n3. Exit admin mode\n";
         std::cin>>adminMenuChoice;
         switch (adminMenuChoice)
         {
         case DELETEPLAYER:
-            deletePlayerHsList();
+            showHighscoreList();
+            std::cout<<"\nEnter name of the player you want to remove: ";
+            std::cin>>playerToBeRemoved;
+            adminDeletePlayer(playerToBeRemoved);
+            break;
+        case EMPTYHSLIST:
+            emptyHighscoreList();
             break;
         case EXITADMINMENU:
             std::cout<<"\nYou chose to exit admin mode!\n";
@@ -254,16 +225,79 @@ void adminMode()
     }
 
 }
-
-void deletePlayerHsList()
+void adminDeletePlayer(std::string playerName)
 {
-    std::vector<std::string> vDisplayResult = readRecordFromFile(fileName);
-    std::cout<<"\nEnter name of the player you want to remove: ";
-    std::string playerToBeRemoved;
-    std::cin>>playerToBeRemoved;
-    adminDeletePlayer(playerToBeRemoved);
+    std::string line;
+    std::ifstream fin;
+    std::ofstream fout;
+    fin.open("players.csv", std::ios::in);
+    fout.open("new.csv", std::ios::out | std::ios::app);
+    std::vector<std::string> lines;
+    while (std::getline(fin, line))
+    {
+        if (line.find(playerName) == std::string::npos)
+        {
+            fout << line << std::endl;
+        }
+    }
+    fout.close();
+    fin.close();
+    std::remove("players.csv");
+    std::rename("new.csv", "players.csv");
+    std::cout<<"\nPlayer and player data has been removed!\n";
 }
 
+void emptyHighscoreList()
+{
+    std::cout<<"\nAre you sure you want to empty the highscore list? Enter '1' to remove or '2' to exit!\n";
+    bDeletePlayerMenu = true;
+    while (bDeletePlayerMenu == true)
+    {
+        std::cin>>menuChoice;
+        switch (menuChoice)
+        {
+        case 1:
+            std::cout<<"\nYou will now empty the highscore list!\n";
+            fout.open("players.csv", std::ofstream::out | std::ofstream::trunc);
+            fout.close();
+            bDeletePlayerMenu = false;
+            system("pause");
+            system("cls");
+            break;
+        case 2:
+            std::cout<<"\nYou chose no!\n";
+            bDeletePlayerMenu = false;
+            system("pause");
+            system("cls");
+            break;
+        default:
+            std::cout<<"\nPlease enter a correct command!\n";
+            break;
+        }
+    }
+    
 
+    
+}
+std::vector<std::string> readRecordFromFile (std::string file_name)
+{
+	std::vector<std::string> record;
+	std::ifstream file;
+	file.open(fileName);
+	std::string field_one, field_two, field_three;
 
-/*functions end */
+	while ( getline(file, field_one, ','))
+	{
+		getline(file, field_two, ',');
+        getline(file, field_three, '\n');
+
+		std::cout << field_one<< "\t"
+                  << field_two << "\t"
+                  << field_three << std::endl;
+	}
+
+	file.close();
+	return record;
+}
+
+/* functions end */
