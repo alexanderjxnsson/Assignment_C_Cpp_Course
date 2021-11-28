@@ -33,8 +33,6 @@ struct Players
 std::vector<std::string> vPlayers;
 /* declarations end */
 
-
-
 /*functions start */
 void fileChecking()
 {
@@ -172,7 +170,6 @@ void adminDeletePlayer(std::string playerName)
     std::rename("new.csv", "players.csv");
     std::cout<<"\nPlayer and player data has been removed!\n";
 }
-
 void emptyHighscoreList()
 {
     std::cout<<"\nAre you sure you want to empty the highscore list? Enter '1' to remove or '2' to exit!\n";
@@ -225,5 +222,4 @@ std::vector<std::string> readRecordFromFile (std::string file_name)
 	file.close();
 	return record;
 }
-
 /* functions end */

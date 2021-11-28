@@ -1,6 +1,5 @@
 /* declarations start */
 #include "header/declarations.h"
-
 /* std::vector<std::string> deleteSearchResult (std::string file_name, std::string search_term)
 {
 	std::vector<std::string> record;
@@ -30,9 +29,7 @@
 	file.close();
 	return record;
 } */
-
 /* declarations end */
-
 int main() {
     /* init start */
     fileChecking();
@@ -72,4 +69,3 @@ int main() {
         }
     }
 }
-
