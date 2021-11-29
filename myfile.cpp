@@ -41,15 +41,16 @@ int main() {
         switch (menuChoice)
         {
         case PLAY:
-            std::cout<<"\nThe game will start\n";
-            system("pause");
+            std::cout<<"\nLoading the game. . .\n";
+            Sleep(2500);
             system("cls");
             //addPlayer();
             theGame();
             break;
         case HIGHSCORE:
+            system("cls");
             showHighscoreList();
-            std::cout<<"\nPress a button to exit the highscore list\n";
+            std::cout<<"\nPress a button to exit the highscore list!\n";
             system("pause");
             system("cls");
             break;
@@ -57,13 +58,13 @@ int main() {
             adminMode();
             break;
         case EXITGAME:
-            std::cout<<"\nYou chose to exit the application\n";
+            std::cout<<"\nYou chose to exit the application!\n";
             myFile.close();
             bMenuRunning = false;
             break;
         default:
-            std::cout<<"\nPlease enter a valid number\n";
-            system("pause");
+            std::cout<<"\nPlease enter a valid number!\n";
+            Sleep(2000);
             system("cls");
             break;
         }

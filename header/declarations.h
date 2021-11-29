@@ -6,11 +6,17 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string>
+#ifdef _WIN32
+    #include <Windows.h>
+#else
+    #include <unistd.h>
+#endif
 std::string fileName = "players.csv", adminPasswordInpuit, adminPassword = "666", value, seperator = "-----------------------------", playerToBeRemoved, deletePlayerChoice;
-int menuChoice, adminMenuChoice, gameGuess, winningNumber, maxGuess = 5;
+int menuChoice, gameGuess, winningNumber, maxGuess = 5;
 bool bMenuRunning = true, bAdminMenu = true, bAdminModeLogin = true, bFileChecking = true, bDeletePlayerMenu = false, bGameRunning = true;
-enum choicesForMenu {PLAY = 1, HIGHSCORE, ADMIN, EXITGAME};
+enum choicesForMainMenu {PLAY = 1, HIGHSCORE, ADMIN, EXITGAME};
 enum choicesForAdminMenu {DELETEPLAYER = 1, EMPTYHSLIST, EXITADMINMENU};
+std::string displaynumberOfTries [5];
 std::fstream fout;
 std::fstream fin;
 std::fstream myFile;
@@ -43,16 +49,16 @@ void fileChecking()
         if (fin.is_open())
         {
             int sec = 3;
-            std::cout<<"File is good, proceed!\n";
+            std::cout<<"File is OK, game loading. . .\n";
             fin.close();
             bFileChecking = false;
-            system("pause");
+            Sleep(2500);
             system("cls");
         }
         else
         {
-            std::cout<<"File is not OK, exiting the application!\n";
-            system("pause");
+            std::cout<<"File is not OK, closing the application!\n";
+            Sleep(4000);
             system("cls");
             bFileChecking = false;
             bMenuRunning = false;
@@ -70,7 +76,7 @@ int randomizer(int a) {
     srand(rand() ^ time(NULL));
     return random = rand() % 10;
 }
-void addPlayer()
+/* void addPlayer()
 {
     fout.open("players.csv", std::ios::out | std::ios::app);
     std::cin.ignore();
@@ -83,28 +89,28 @@ void addPlayer()
             << tPlayer.numberOfTries << "\n";
     std::cout<<"\nPlayer has been added to the highscore list!\n";
     fout.close();
-    system("pause");
+    Sleep(2500);
     system("cls"); 
-}
+} */
 void theGame()
 {
     fout.open("players.csv", std::ios::out | std::ios::app);
     std::cin.ignore();
     std::cout<<"Enter name of player: ";    std::getline(std::cin, tPlayer.playerName);
     std::cout<<"Enter city of player: ";    std::getline(std::cin, tPlayer.playerCity);
-    std::cout<<"\nLet's play!!\n";
-    system("pause");
+    std::cout<<"\nLet's play!! Game loading. . .\n";
+    Sleep(2500);
     system("cls");
-    std::cout<<"Rules:\n- Guess a number between 1 and 10.\n- You have 5 tries before the game ends.\nYes, it's that simple\nLets's GO!\n";
+    std::cout<<"Rules:\n- Guess a number between 0 and 10.\n- You have 5 tries before the game ends.\nYes, it's that simple\nLets's GO!\n";
     bGameRunning = true;
     tPlayer.numberOfTries = 0;
     tPlayer.playerScore = 0;
     winningNumber = randomizer(winningNumber);
     while (bGameRunning == true)
     {
-        
         std::cout<<winningNumber<<std::endl;
-        std::cout<<"The number has been randomized, GUESS!\n";
+        std::cout<<"\nThe number has been randomized, GUESS!\n";
+        std::cout<<"Your guess: ";
         std::cin>>gameGuess;
         if (gameGuess == winningNumber)
         {
@@ -117,7 +123,7 @@ void theGame()
             {
             case 1:
                 std::cout<<"\nWe will clear the screen and restart the game!\n";
-                system("pause");
+                Sleep(2500);
                 system("cls");
                 break;
             case 2:
@@ -129,7 +135,7 @@ void theGame()
                 vPlayers.push_back(tPlayer);
                 std::cout<<"\nPlayer has been added to the highscore list!\n";
                 fout.close();
-                system("pause");
+                Sleep(2500);
                 system("cls"); 
                 bGameRunning = false;
                 break;
@@ -142,9 +148,15 @@ void theGame()
         {
             std::cout<<"\nSorry, please try again!\n";
             tPlayer.numberOfTries += 1;
+            std::cout<<"Tries: ";
+            for (int i = 1; i <= tPlayer.numberOfTries; i++)
+            {
+                std::cout<<"["<<i<<"]";
+            }
+            
             if (tPlayer.numberOfTries == maxGuess)
             {
-                std::cout<<"\nYou've reached the number of tries, you lost!\nYou will be exiting to the main menu.\nSee you soon!\n";
+                std::cout<<"\n\nYou've reached the number of tries, you lost!\nYou will be exiting to the main menu.\nSee you soon!\n";
                 fout    << tPlayer.playerName << ","
                         << tPlayer.playerCity << ","
                         << tPlayer.playerScore << ","
@@ -152,7 +164,7 @@ void theGame()
                 vPlayers.push_back(tPlayer);
                 std::cout<<"\nPlayer has been added to the highscore list!\n";
                 fout.close();
-                system("pause");
+                Sleep(2500);
                 system("cls"); 
                 bGameRunning = false;
             }
@@ -162,8 +174,6 @@ void theGame()
             std::cout<<"\nPlease enter a number between 0 and 10!\n";
         }
     }
-    
-
 }
 void showHighscoreList()
 {
@@ -179,17 +189,16 @@ void adminMode()
         std::cin>>adminPasswordInpuit;
         if (adminPasswordInpuit == adminPassword)
         {
-            std::cout<<"\nAdmin mode activated!\n";
+            std::cout<<"\nAdmin mode activated!\nLoading. . .\n";
             bAdminMenu = true;
             bAdminModeLogin = false;
-            system("pause");
+            Sleep(2000);
             system("cls");
         }
         else
         {
             std::cout<<"\nIncorrect password, try again\n";
-            system("pause");
-            system("cls");
+            Sleep(2000);
         }
     }
     //If login successful
@@ -197,8 +206,8 @@ void adminMode()
     {
         std::cout<<"What do you want to do?\n";
         std::cout<<"1. Delete person in highscore list\n2. Empty the highscore list\n3. Exit admin mode\n";
-        std::cin>>adminMenuChoice;
-        switch (adminMenuChoice)
+        std::cin>>menuChoice;
+        switch (menuChoice)
         {
         case DELETEPLAYER:
             showHighscoreList();
@@ -210,21 +219,20 @@ void adminMode()
             emptyHighscoreList();
             break;
         case EXITADMINMENU:
-            std::cout<<"\nYou chose to exit admin mode!\n";
+            std::cout<<"\nYou chose to exit admin mode!\nLoading main menu. . .\n";
             bAdminMenu = false;
             bAdminModeLogin = false;
             myFile.close();
-            system("pause");
+            Sleep(2500);
             system("cls");
             break;
         default:
             std::cout<<"\nPlease enter a valid number!\n";
-            system("pause");
+            Sleep(2500);
             system("cls");
             break;
         }
     }
-
 }
 void adminDeletePlayer(std::string playerName)
 {
@@ -245,11 +253,13 @@ void adminDeletePlayer(std::string playerName)
     fin.close();
     std::remove("players.csv");
     std::rename("new.csv", "players.csv");
-    std::cout<<"\nPlayer and player data has been removed!\n";
+    std::cout<<"\nPlayer data has been removed!\n";
+    Sleep(2500);
+    system("cls");
 }
 void emptyHighscoreList()
 {
-    std::cout<<"\nAre you sure you want to empty the highscore list? Enter '1' to epty the list or '2' to exit!\n";
+    std::cout<<"\nAre you sure you want to empty the highscore list?\n1. Yes\n2. No\n";
     bDeletePlayerMenu = true;
     while (bDeletePlayerMenu == true)
     {
@@ -257,17 +267,17 @@ void emptyHighscoreList()
         switch (menuChoice)
         {
         case 1:
-            std::cout<<"\nYou will now empty the highscore list!\n";
+            std::cout<<"\nEmptying list. . .";
             fout.open("players.csv", std::ofstream::out | std::ofstream::trunc);
             fout.close();
             bDeletePlayerMenu = false;
-            system("pause");
+            Sleep(2500);
             system("cls");
             break;
         case 2:
-            std::cout<<"\nYou chose no!\n";
+            std::cout<<"\nYou chose no!\nResetting. . .";
             bDeletePlayerMenu = false;
-            system("pause");
+            Sleep(2500);
             system("cls");
             break;
         default:
@@ -275,27 +285,24 @@ void emptyHighscoreList()
             break;
         }
     }
-    
-
-    
 }
 std::vector<std::string> readRecordFromFile (std::string file_name)
 {
 	std::vector<std::string> record;
 	std::ifstream file;
 	file.open(fileName);
-	std::string field_one, field_two, field_three, field_four;
+	std::string fieldOne, fieldTwo, fieldThree, fieldFour;
 
-	while ( getline(file, field_one, ','))
+	while ( getline(file, fieldOne, ','))
 	{
-		getline(file, field_two, ',');
-        getline(file, field_three, ',');
-        getline(file, field_four, '\n');
+		getline(file, fieldTwo, ',');
+        getline(file, fieldThree, ',');
+        getline(file, fieldFour, '\n');
 
-		std::cout << field_one << "\t"
-                  << field_two << "\t"
-                  << field_three << "\t"
-                  << field_four << std::endl;
+		std::cout << fieldOne << "\t"
+                  << fieldTwo << "\t"
+                  << fieldThree << "\t"
+                  << fieldFour << std::endl;
 	}
 	file.close();
 	return record;
