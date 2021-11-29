@@ -44,7 +44,7 @@ int main() {
             std::cout<<"\nThe game will start\n";
             system("pause");
             system("cls");
-            addPlayer();
+            //addPlayer();
             theGame();
             break;
         case HIGHSCORE:

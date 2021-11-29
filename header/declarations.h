@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string>
 std::string fileName = "players.csv", adminPasswordInpuit, adminPassword = "666", value, seperator = "-----------------------------", playerToBeRemoved, deletePlayerChoice;
-int menuChoice, adminMenuChoice, idTracker = 0;
-bool bMenuRunning = true, bAdminMenu = true, bAdminModeLogin = true, bFileChecking = true, bDeletePlayerMenu = false;
+int menuChoice, adminMenuChoice, gameGuess, winningNumber, maxGuess = 5;
+bool bMenuRunning = true, bAdminMenu = true, bAdminModeLogin = true, bFileChecking = true, bDeletePlayerMenu = false, bGameRunning = true;
 enum choicesForMenu {PLAY = 1, HIGHSCORE, ADMIN, EXITGAME};
 enum choicesForAdminMenu {DELETEPLAYER = 1, EMPTYHSLIST, EXITADMINMENU};
 std::fstream fout;
@@ -28,9 +28,10 @@ struct Players
 {
     std::string playerName;
     std::string playerCity;
-    int Playerscore;
+    int playerScore = 0;
+    int numberOfTries = 0;
 }tPlayer;
-std::vector<std::string> vPlayers;
+std::vector<Players> vPlayers;
 /* declarations end */
 
 /*functions start */
@@ -75,17 +76,93 @@ void addPlayer()
     std::cin.ignore();
     std::cout<<"Enter name of player: ";    std::getline(std::cin, tPlayer.playerName);
     std::cout<<"Enter city of player: ";    std::getline(std::cin, tPlayer.playerCity);
-    idTracker++;
+
     fout    << tPlayer.playerName << ","
-            << tPlayer.playerCity <<","
-            << tPlayer.Playerscore << "\n";
-    std::cout<<"\nPlayer has been created, proceeding to game!\n";
+            << tPlayer.playerCity << ","
+            << tPlayer.playerScore << ", "
+            << tPlayer.numberOfTries << "\n";
+    std::cout<<"\nPlayer has been added to the highscore list!\n";
     fout.close();
     system("pause");
     system("cls"); 
 }
 void theGame()
 {
+    fout.open("players.csv", std::ios::out | std::ios::app);
+    std::cin.ignore();
+    std::cout<<"Enter name of player: ";    std::getline(std::cin, tPlayer.playerName);
+    std::cout<<"Enter city of player: ";    std::getline(std::cin, tPlayer.playerCity);
+    std::cout<<"\nLet's play!!\n";
+    system("pause");
+    system("cls");
+    std::cout<<"Rules:\n- Guess a number between 1 and 10.\n- You have 5 tries before the game ends.\nYes, it's that simple\nLets's GO!\n";
+    bGameRunning = true;
+    tPlayer.numberOfTries = 0;
+    tPlayer.playerScore = 0;
+    winningNumber = randomizer(winningNumber);
+    while (bGameRunning == true)
+    {
+        
+        std::cout<<winningNumber<<std::endl;
+        std::cout<<"The number has been randomized, GUESS!\n";
+        std::cin>>gameGuess;
+        if (gameGuess == winningNumber)
+        {
+            std::cout<<"\nCONGRATZ, YOU GOT IT!\n";
+            tPlayer.playerScore += 1;
+            tPlayer.numberOfTries +=1;
+            std::cout<<"\nDo you want to play again?\n1. Yes\n2. No\n";
+            std::cin>>menuChoice;
+            switch (menuChoice)
+            {
+            case 1:
+                std::cout<<"\nWe will clear the screen and restart the game!\n";
+                system("pause");
+                system("cls");
+                break;
+            case 2:
+                std::cout<<"\nYou chose not to play again, you will be exiting to the main menu! Thanks for playing!\n";
+                fout    << tPlayer.playerName << ","
+                        << tPlayer.playerCity << ","
+                        << tPlayer.playerScore << ","
+                        << tPlayer.numberOfTries << "\n";
+                vPlayers.push_back(tPlayer);
+                std::cout<<"\nPlayer has been added to the highscore list!\n";
+                fout.close();
+                system("pause");
+                system("cls"); 
+                bGameRunning = false;
+                break;
+            default:
+                std::cout<<"\nPlease enter a correct value!\n";
+                break;
+            }
+        }
+        else if (gameGuess != winningNumber)
+        {
+            std::cout<<"\nSorry, please try again!\n";
+            tPlayer.numberOfTries += 1;
+            if (tPlayer.numberOfTries == maxGuess)
+            {
+                std::cout<<"\nYou've reached the number of tries, you lost!\nYou will be exiting to the main menu.\nSee you soon!\n";
+                fout    << tPlayer.playerName << ","
+                        << tPlayer.playerCity << ","
+                        << tPlayer.playerScore << ","
+                        << tPlayer.numberOfTries << "\n";
+                vPlayers.push_back(tPlayer);
+                std::cout<<"\nPlayer has been added to the highscore list!\n";
+                fout.close();
+                system("pause");
+                system("cls"); 
+                bGameRunning = false;
+            }
+        }
+        else if (gameGuess > 10 || gameGuess < 0)
+        {
+            std::cout<<"\nPlease enter a number between 0 and 10!\n";
+        }
+    }
+    
 
 }
 void showHighscoreList()
@@ -172,7 +249,7 @@ void adminDeletePlayer(std::string playerName)
 }
 void emptyHighscoreList()
 {
-    std::cout<<"\nAre you sure you want to empty the highscore list? Enter '1' to remove or '2' to exit!\n";
+    std::cout<<"\nAre you sure you want to empty the highscore list? Enter '1' to epty the list or '2' to exit!\n";
     bDeletePlayerMenu = true;
     while (bDeletePlayerMenu == true)
     {
@@ -207,18 +284,19 @@ std::vector<std::string> readRecordFromFile (std::string file_name)
 	std::vector<std::string> record;
 	std::ifstream file;
 	file.open(fileName);
-	std::string field_one, field_two, field_three;
+	std::string field_one, field_two, field_three, field_four;
 
 	while ( getline(file, field_one, ','))
 	{
 		getline(file, field_two, ',');
-        getline(file, field_three, '\n');
+        getline(file, field_three, ',');
+        getline(file, field_four, '\n');
 
-		std::cout << field_one<< "\t"
+		std::cout << field_one << "\t"
                   << field_two << "\t"
-                  << field_three << std::endl;
+                  << field_three << "\t"
+                  << field_four << std::endl;
 	}
-
 	file.close();
 	return record;
 }
