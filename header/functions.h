@@ -298,7 +298,7 @@ std::vector<std::string> readCsvFile (std::string file_name)
 {
 	std::vector<std::string> record;
 	std::ifstream file;
-	file.open(fileName);
+	file.open(file_name);
 	std::string fieldOne, fieldTwo, fieldThree, fieldFour;
 
 	while ( getline(file, fieldOne, ','))
@@ -307,11 +307,7 @@ std::vector<std::string> readCsvFile (std::string file_name)
         getline(file, fieldThree, ',');
         getline(file, fieldFour, '\n');
 
-		std::cout /* << fieldOne << "\t"
-                  << fieldTwo << "\t"
-                  << fieldThree << "\t"
-                  << fieldFour << std::endl; */
-        //<<std::right
+		std::cout
         <<"|| "<< std::left << std::setw(12) << fieldOne<<" || "
         <<std::setw(15) <<fieldTwo<<" || "
         <<std::setw(8)<<fieldThree<<" || "
