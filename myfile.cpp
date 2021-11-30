@@ -1,5 +1,5 @@
 /* declarations start */
-#include "header/declarations.h"
+#include "header/functions.h"
 /* declarations end */
 int main() {
     /* init start */
