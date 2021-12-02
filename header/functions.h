@@ -42,10 +42,14 @@ void welcomeHeader()
 void ingameHeader()
 {
     std::cout << "#" << std::right << std::setfill('=') << std::setw(50) << "#" << std::endl
-                << "#" << std::right << std::setfill(' ') << std::setw(50) << "#" << std::endl
                 << "#" << std::left << std::setfill(' ') << std::setw(9) << " " << std::right 
                 << std::setw(26) << "Time for some guessing!" << std::right << std::setw(15) << "#" << std::endl
-                << "#" << std::right << std::setfill(' ') << std::setw(50) << "#" << std::endl
+                << "#" << std::left << std::setfill(' ') << std::setw(9) << " " << std::right 
+                << std::setw(26) << "- Guess a number between 1 and 10." << std::right << std::setw(7) << "#" << std::endl
+                << "#" << std::left << std::setfill(' ') << std::setw(9) << " " << std::right 
+                << std::setw(26) << "- If you lose, the game ends!" << std::right << std::setw(12) << "#" << std::endl
+                << "#" << std::left << std::setfill(' ') << std::setw(9) << " " << std::right 
+                << std::setw(26) << "- You have 5 guesses!" << std::right << std::setw(15) << "#" << std::endl
                 << "#" << std::right << std::setfill('=') << std::setw(50) << "#" << std::endl
                 <<std::setfill(' ');
 }
@@ -64,7 +68,7 @@ void highscoreHeader()
     std::cout << "#" << std::right << std::setfill('=') << std::setw(57) << "#" << std::endl
                 << "#" << std::right << std::setfill(' ') << std::setw(57) << "#" << std::endl
                 << "#" << std::left << std::setfill(' ') << std::setw(9) << " " << std::right 
-                << std::setw(26) << "Highscore!" << std::right << std::setw(22) << "#" << std::endl
+                << std::setw(23) << "Highscore!" << std::right << std::setw(25) << "#" << std::endl
                 << "#" << std::right << std::setfill(' ') << std::setw(57) << "#" << std::endl
                 << "#" << std::right << std::setfill('=') << std::setw(57) << "#" << std::endl
                 <<std::setfill(' ');
@@ -152,7 +156,7 @@ void theGame()
     tempTotalTries = 0;
     displayAllTries = 0;
     std::cin.ignore();
-    std::cout<<"Rules:\n- Guess a number between 1 and 10.\n- You have 5 tries before the game ends.\nYes, it's that simple\nLets's GO!\n\n";
+    ingameHeader();
     std::cout<<"Enter the name of player: ";    std::getline(std::cin, tPlayer.playerName);
     std::cout<<"Enter hometown of player: ";    std::getline(std::cin, tPlayer.playerCity);
     std::cout<<"\nLet's play!! Game loading. . .\n";
@@ -163,9 +167,9 @@ void theGame()
     ingameTable();
     while (bGameRunning == true)
     {
-        
-        std::cout<<std::endl<<winningNumber<<std::endl;
-        
+        //TA BORT
+        std::cout<<"Cheat: "<<winningNumber<<std::endl;
+        //TA BORT
         std::cout<<"Your guess: ";
         std::cin>>gameGuess;
         if (gameGuess == winningNumber)
@@ -191,7 +195,7 @@ void theGame()
                     system("cls");
                     ingameHeader();
                     ingameTable();
-                    std::cout<<"\nThe number has been randomized, GUESS!\n";
+                    std::cout<<"The number has been randomized, GUESS!\n";
                     break;
                 case 2:
                     std::cout<<"\nYou chose not to play again, you will be exiting to the main menu! Thanks for playing!\n";
@@ -292,6 +296,11 @@ void showHighscoreList()
     
     fin.open(fileName, std::ifstream::in);
     vPlayers.clear();
+    if (!getline(fin, fieldOne, ','))
+    {
+        std::cout<<"\nThe highscore list is empty!\n";
+    }
+    
     while ( getline(fin, fieldOne, ','))
 	    {
             getline(fin, fieldTwo, ',');
