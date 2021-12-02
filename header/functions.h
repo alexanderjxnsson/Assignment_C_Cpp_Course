@@ -1,5 +1,4 @@
 #include "declarations.h"
-
 /*functions start */
 void fileChecking()
 {
@@ -50,6 +49,26 @@ void ingameHeader()
                 << "#" << std::right << std::setfill('=') << std::setw(50) << "#" << std::endl
                 <<std::setfill(' ');
 }
+void adminHeader()
+{
+    std::cout << "#" << std::right << std::setfill('=') << std::setw(50) << "#" << std::endl
+                << "#" << std::right << std::setfill(' ') << std::setw(50) << "#" << std::endl
+                << "#" << std::left << std::setfill(' ') << std::setw(9) << " " << std::right 
+                << std::setw(26) << "You're logged in as admin!" << std::right << std::setw(15) << "#" << std::endl
+                << "#" << std::right << std::setfill(' ') << std::setw(50) << "#" << std::endl
+                << "#" << std::right << std::setfill('=') << std::setw(50) << "#" << std::endl
+                <<std::setfill(' ');
+}
+void highscoreHeader()
+{
+    std::cout << "#" << std::right << std::setfill('=') << std::setw(57) << "#" << std::endl
+                << "#" << std::right << std::setfill(' ') << std::setw(57) << "#" << std::endl
+                << "#" << std::left << std::setfill(' ') << std::setw(9) << " " << std::right 
+                << std::setw(26) << "Highscore!" << std::right << std::setw(22) << "#" << std::endl
+                << "#" << std::right << std::setfill(' ') << std::setw(57) << "#" << std::endl
+                << "#" << std::right << std::setfill('=') << std::setw(57) << "#" << std::endl
+                <<std::setfill(' ');
+}
 void menu()
 {
     
@@ -73,6 +92,7 @@ void mainMenu()
             break;
         case HIGHSCORE:
             system("cls");
+            highscoreHeader();
             columnBanner();
             showHighscoreList();
             std::cout<<"\nPress a button to exit the highscore list!\n";
@@ -97,7 +117,6 @@ void mainMenu()
 }
 void ingameTable()
 {
-    tempTotalTries = tempTries;
     std::cout<<seperator2
         <<std::left
         <<"|| " <<std::setw(8)<<"Score"<<" || "
@@ -106,7 +125,7 @@ void ingameTable()
     std::cout
         <<"|| " << std::left << std::setw(8);
         std::cout << tempScore << " || "
-        <<std::setw(5) << tempTotalTries << " ||"
+        <<std::setw(5) << displayAllTries << " ||"
         <<std::endl<<seperator2;
 }
 void columnBanner()
@@ -131,6 +150,7 @@ void theGame()
     tempTries = 0;
     tempScore = 0;
     tempTotalTries = 0;
+    displayAllTries = 0;
     std::cin.ignore();
     std::cout<<"Rules:\n- Guess a number between 1 and 10.\n- You have 5 tries before the game ends.\nYes, it's that simple\nLets's GO!\n\n";
     std::cout<<"Enter the name of player: ";    std::getline(std::cin, tPlayer.playerName);
@@ -145,13 +165,17 @@ void theGame()
     {
         
         std::cout<<std::endl<<winningNumber<<std::endl;
-        std::cout<<"\nThe number has been randomized, GUESS!\n";
+        
         std::cout<<"Your guess: ";
         std::cin>>gameGuess;
         if (gameGuess == winningNumber)
         {
+            displayAllTries++;
             tempTries++;
             tempScore += settingTheScore(tempTries);
+            system("cls");
+            ingameHeader();
+            ingameTable();
             std::cout<<"\nCONGRATZ, YOU GOT IT!\n";
             std::cout<<"\nDo you want to play again?\n1. Yes\n2. No\n";
             std::cin>>menuChoice;
@@ -165,6 +189,9 @@ void theGame()
                     winningNumber = randomizer(winningNumber);
                     Sleep(sleepTime);
                     system("cls");
+                    ingameHeader();
+                    ingameTable();
+                    std::cout<<"\nThe number has been randomized, GUESS!\n";
                     break;
                 case 2:
                     std::cout<<"\nYou chose not to play again, you will be exiting to the main menu! Thanks for playing!\n";
@@ -190,6 +217,7 @@ void theGame()
         }
         else if (gameGuess != winningNumber)
         {
+            displayAllTries++;
             tempTries++;
             guessingHistory[X] = gameGuess;
             X++;
@@ -201,7 +229,6 @@ void theGame()
             {
                 std::cout<<"["<<guessingHistory[i]<<"]";
             }
-            std::cout<<"\nSorry, please try again!\n";
             if (gameGuess > winningNumber)
             {
                 std::cout<<"\nYour guess was higher than the secret number!\n";
@@ -262,7 +289,7 @@ int settingTheScore(int tries)
 }
 void showHighscoreList()
 {
-    //std::vector<std::string> vDisplayHighscoreList = readCsvFile(fileName);
+    
     fin.open(fileName, std::ifstream::in);
     vPlayers.clear();
     while ( getline(fin, fieldOne, ','))
@@ -286,8 +313,6 @@ void showHighscoreList()
         <<std::setw(5)<<vPlayers[i].numberOfTries<<" ||"
         <<std::endl<<seperator;
     }
-    
-    
 }
 void adminMode()
 {
@@ -314,6 +339,7 @@ void adminMode()
     //If login successful
     while (bAdminMenu == true)
     {
+        adminHeader();
         std::cout<<"What do you want to do?\n";
         std::cout<<"1. Delete person in highscore list\n2. Empty the highscore list\n3. Exit admin mode\n";
         std::cin>>menuChoice;
@@ -408,28 +434,4 @@ void emptyHighscoreList()
         }
     }
 }
-/* std::vector<std::string> readCsvFile (std::string file_name)
-{
-	std::vector<std::string> record;
-	std::ifstream file;
-	file.open(file_name);
-	std::string fieldOne, fieldTwo, fieldThree, fieldFour;
-
-	while ( getline(file, fieldOne, ','))
-	{
-		getline(file, fieldTwo, ',');
-        getline(file, fieldThree, ',');
-        getline(file, fieldFour, '\n');
-
-		std::cout
-        <<"|| "<< std::left << std::setw(12) << fieldOne<<" || "
-        <<std::setw(15) <<fieldTwo<<" || "
-        <<std::setw(8)<<fieldThree<<" || "
-        <<std::setw(5)<<fieldFour<<" ||"
-        <<std::endl<<seperator;
-	}
-	file.close();
-	return record;
-} */
-
 /* functions end */
