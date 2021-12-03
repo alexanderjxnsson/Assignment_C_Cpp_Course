@@ -1,5 +1,6 @@
 #include "declarations.h"
 /*functions start */
+/* init func */
 void fileChecking()
 {
     fin.open("players.csv", std::ios_base::app);
@@ -29,6 +30,7 @@ void fileChecking()
         bMenuRunning = false;
     }
 }
+/* header/table funcs */
 void welcomeHeader()
 {
     std::cout << "#" << std::right << std::setfill('=') << std::setw(50) << "#" << std::endl
@@ -73,6 +75,57 @@ void highscoreHeader()
                 << "#" << std::right << std::setfill('=') << std::setw(57) << "#" << std::endl
                 <<std::setfill(' ');
 }
+void columnBanner()
+{
+    std::cout<<seperator
+        <<std::left
+        <<"|| " <<std::setw(12)<<"Name"<<" || "
+        <<std::setw(15)<<"City"<<" || "
+        <<std::setw(8)<<"Points"<<" || "
+        <<std::setw(2)<<"Tries ||"<<std::endl
+        <<seperator;
+}
+void ingameTable()
+{
+    std::cout<<seperator2
+        <<std::left
+        <<"|| " <<std::setw(8)<<"Score"<<" || "
+        <<std::setw(8)<<"Tries ||"<<std::endl
+        <<seperator2;
+    std::cout
+        <<"|| " << std::left << std::setw(8);
+        std::cout << tempScore << " || "
+        <<std::setw(5) << displayAllTries << " ||"
+        <<std::endl<<seperator2;
+}
+void showHighscoreList()
+{
+    
+    fin.open(fileName, std::ifstream::in);
+    vPlayers.clear();
+    while ( getline(fin, fieldOne, ','))
+	    {
+            getline(fin, fieldTwo, ',');
+            getline(fin, fieldThree, ',');
+            getline(fin, fieldFour, '\n');
+            tPlayer.playerName = fieldOne;
+            tPlayer.playerCity = fieldTwo;
+            tPlayer.playerScore = stoi(fieldThree);
+            tPlayer.numberOfTries = stoi(fieldFour);
+            vPlayers.push_back(tPlayer);
+        }
+    fin.close();
+    for (int i = 0; i < vPlayers.size(); i++)
+    {
+        std::cout
+        <<"|| " << std::left << std::setw(12) << vPlayers[i].playerName<<" || "
+        <<std::setw(15) <<vPlayers[i].playerCity<<" || "
+        <<std::setw(8)<<vPlayers[i].playerScore<<" || "
+        <<std::setw(5)<<vPlayers[i].numberOfTries<<" ||"
+        <<std::endl<<seperator;
+    }
+}
+/* main menu funcs */
 void menu()
 {
     
@@ -119,29 +172,7 @@ void mainMenu()
         }
     }
 }
-void ingameTable()
-{
-    std::cout<<seperator2
-        <<std::left
-        <<"|| " <<std::setw(8)<<"Score"<<" || "
-        <<std::setw(8)<<"Tries ||"<<std::endl
-        <<seperator2;
-    std::cout
-        <<"|| " << std::left << std::setw(8);
-        std::cout << tempScore << " || "
-        <<std::setw(5) << displayAllTries << " ||"
-        <<std::endl<<seperator2;
-}
-void columnBanner()
-{
-    std::cout<<seperator
-        <<std::left
-        <<"|| " <<std::setw(12)<<"Name"<<" || "
-        <<std::setw(15)<<"City"<<" || "
-        <<std::setw(8)<<"Points"<<" || "
-        <<std::setw(2)<<"Tries ||"<<std::endl
-        <<seperator;
-}
+/* game funcs */
 int randomizer(int a) {
     int random;
     srand(time(0));
@@ -245,6 +276,7 @@ void theGame()
             if (tempTries == maxGuess)
             {
                 std::cout<<"\n\nYou've reached the number of tries, you lost!\nYou will be exiting to the main menu.\nSee you soon!\n";
+                tempTotalTries += tempTries;
                 tPlayer.playerScore = tempScore;
                 tPlayer.numberOfTries = tempTotalTries;
                 fout.open("players.csv", std::ofstream::app);
@@ -255,9 +287,9 @@ void theGame()
                 fout.close();
                 vPlayers.push_back(tPlayer);
                 X = 0;
-                std::cout<<"\nPlayer has been added to the highscore list!\n\nLoading main menu. . .";
+                std::cout<<"\nPlayer has been added to the highscore list!\n";
                 
-                Sleep(3500);
+                system("pause");
                 system("cls");
                 
                 bGameRunning = false;
@@ -291,42 +323,12 @@ int settingTheScore(int tries)
     return score += 5;
 
 }
-void showHighscoreList()
-{
-    
-    fin.open(fileName, std::ifstream::in);
-    vPlayers.clear();
-    if (!getline(fin, fieldOne, ','))
-    {
-        std::cout<<"\nThe highscore list is empty!\n";
-    }
-    
-    while ( getline(fin, fieldOne, ','))
-	    {
-            getline(fin, fieldTwo, ',');
-            getline(fin, fieldThree, ',');
-            getline(fin, fieldFour, '\n');
-            tPlayer.playerName = fieldOne;
-            tPlayer.playerCity = fieldTwo;
-            tPlayer.playerScore = stoi(fieldThree);
-            tPlayer.numberOfTries = stoi(fieldFour);
-            vPlayers.push_back(tPlayer);
-        }
-    fin.close();
-    for (int i = 0; i < vPlayers.size(); i++)
-    {
-        std::cout
-        <<"|| " << std::left << std::setw(12) << vPlayers[i].playerName<<" || "
-        <<std::setw(15) <<vPlayers[i].playerCity<<" || "
-        <<std::setw(8)<<vPlayers[i].playerScore<<" || "
-        <<std::setw(5)<<vPlayers[i].numberOfTries<<" ||"
-        <<std::endl<<seperator;
-    }
-}
+/* admin funcs */
 void adminMode()
 {
     //Logging in
     bAdminModeLogin = true;
+    adminPasswordCount = 0;
     while (bAdminModeLogin == true)
     {
         std::cout<<"Enter the admin password: ";
@@ -341,8 +343,16 @@ void adminMode()
         }
         else
         {
+            adminPasswordCount++;
             std::cout<<"\nIncorrect password, try again\n";
-            Sleep(2000);
+            if (adminPasswordCount == 3)
+            {
+                std::cout<<"You entered the wrong password three times.\nYou'll be exiting to the main menu!\n";
+                bAdminModeLogin = false;
+                bAdminMenu = false;
+                Sleep(3000);
+                system("cls");
+            }
         }
     }
     //If login successful
