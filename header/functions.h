@@ -198,9 +198,6 @@ void theGame()
     ingameTable();
     while (bGameRunning == true)
     {
-        //TA BORT
-        std::cout<<"Cheat: "<<winningNumber<<std::endl;
-        //TA BORT
         std::cout<<"Your guess: ";
         std::cin>>gameGuess;
         if (gameGuess == winningNumber)

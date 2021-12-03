@@ -11,7 +11,7 @@ std::string fileName = "players.csv", adminPasswordInpuit, adminPassword = "666"
 value, seperator = "==========================================================\n",
 playerToBeRemoved, deletePlayerChoice, fieldOne, fieldTwo, fieldThree, fieldFour,
 seperator2 = "=======================\n";
-int menuChoice, gameGuess, winningNumber, maxGuess = 5, X = 0, sleepTime = 1250, tempTries = 0, tempScore = 0, tempTotalTries = 0, displayAllTries = 0, adminPasswordCount = 0;
+int menuChoice, gameGuess, winningNumber, maxGuess = 5, X = 0, sleepTime = 2250, tempTries = 0, tempScore = 0, tempTotalTries = 0, displayAllTries = 0, adminPasswordCount = 0;
 bool bMenuRunning = true, bAdminMenu = true, bAdminModeLogin = true, bFileChecking = true, bDeletePlayerMenu = false, bGameRunning = true;
 enum choicesForMainMenu {PLAY = 1, HIGHSCORE, ADMIN, EXITGAME};
 enum choicesForAdminMenu {DELETEPLAYER = 1, EMPTYHSLIST, EXITADMINMENU};
@@ -39,7 +39,6 @@ int settingTheScore(int a);
 void adminMode();
 void adminDeletePlayer(std::string playerName);
 void emptyHighscoreList();
-//std::vector<std::string> readCsvFile (std::string file_name);
 struct Players
 {
     std::string playerName;

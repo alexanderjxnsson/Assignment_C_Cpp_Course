@@ -13,6 +13,10 @@ Satt i dagar och till slut fick jag börja läsa min kod från början och hitta
 Programmet består utav 3 filer + .csv, main.cpp, functions.h, declarations.h. Programmet börjar i main.cpp, där kollar vi så att filen är OK samt lägger in allt i en vector som är kopplad till en struct.
 Är filen OK aktiverar vi bMenuRunning-boolen som tillåter oss att loopa i mainMenu-functionen. Är filen inte OK sätter vi bMenuRunning till false, samt stänger programmet.
 
+Bra att veta:
+- Admins lösenord är en konstant satt till 666.
+- Variabeln sleepTime är satt till 2250, den går att öka för att hinna med att läsa vad som kommer upp innan skärmen töms.
+
 Funktionerna förklarade:
 
 void fileChecking()
