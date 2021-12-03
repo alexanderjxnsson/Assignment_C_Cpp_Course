@@ -15,7 +15,7 @@ Programmet består utav 3 filer + .csv, main.cpp, functions.h, declarations.h. P
 
 Bra att veta:
 - Admins lösenord är en konstant satt till 666.
-- Variabeln sleepTime är satt till 2250, den går att öka för att hinna med att läsa vad som kommer upp innan skärmen töms.
+- Variabeln sleepTime, som används i funktioen Sleep(), är satt till 2250, den går att öka för att hinna med att läsa vad som kommer upp innan skärmen töms.
 
 Funktionerna förklarade:
 
